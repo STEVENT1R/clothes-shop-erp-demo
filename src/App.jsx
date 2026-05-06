@@ -1211,19 +1211,6 @@ export default function App() {
             </header>
             <div className="page-content">{renderPage()}</div>
           </main>
-          <nav className="bottom-nav">
-            <div className="bottom-nav-inner">
-              {navItems.map(item => {
-                const Icon = item.icon;
-                return (
-                  <button key={item.id} className={`bottom-nav-item ${page === item.id ? 'active' : ''}`} onClick={() => setPage(item.id)}>
-                    <Icon className="bnav-icon" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
         </div>
       </AppProvider>
     </ThemeContext.Provider>
