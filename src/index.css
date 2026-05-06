@@ -278,11 +278,14 @@ body {
   color: var(--text-white);
   position: fixed;
   height: 100vh;
+  height: calc(100vh - env(safe-area-inset-bottom, 0px));
   z-index: 100;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
   overflow: hidden;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .sidebar-header {
@@ -429,6 +432,7 @@ body {
   top: 0;
   z-index: 50;
   backdrop-filter: blur(20px);
+  padding-top: calc(1rem + env(safe-area-inset-top, 0px));
 }
 
 .header-left {
@@ -1349,6 +1353,7 @@ tr:hover td {
   background: var(--bg-nav);
   border-top: 1px solid var(--border);
   padding: 6px 4px;
+  padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
   z-index: 200;
   backdrop-filter: blur(20px);
   box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
@@ -1450,7 +1455,8 @@ tr:hover td {
   background: var(--bg-card);
   border-bottom: 1px solid var(--border);
   padding: 0 1.5rem;
-  height: 64px;
+  padding-top: env(safe-area-inset-top, 0px);
+  height: calc(64px + env(safe-area-inset-top, 0px));
   display: flex;
   align-items: center;
   justify-content: space-between;
