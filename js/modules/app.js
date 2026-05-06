@@ -40,8 +40,14 @@ const app = {
 
         this.currentPage = page;
 
-        // Close sidebar on mobile after navigation
-        if (window.innerWidth <= 768) {
+        // رصد وضع العرض المستقل (PWA) وإخفاء شريط تثبيت التطبيق
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            const banner = document.getElementById('pwaBanner');
+            if (banner) banner.style.display = 'none';
+        }
+
+        // Close sidebar on mobile/tablet after navigation
+        if (window.innerWidth <= 1024) {
             this.closeSidebar();
         }
 
@@ -142,7 +148,7 @@ const app = {
         const sidebar = document.getElementById('sidebar');
         let overlay = document.querySelector('.sidebar-overlay');
 
-        if (window.innerWidth <= 768) {
+        if (window.innerWidth <= 1024) {
             sidebar.classList.toggle('mobile-open');
             sidebar.classList.remove('collapsed');
             if (!overlay) {
