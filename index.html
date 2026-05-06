@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الملابس</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fas fa-tshirt"></i>
+                <h1>نظام إدارة الملابس</h1>
+                <p>نظام إدارة خفيف لمتاجر الملابس</p>
+            </div>
+            <div class="login-form">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> اختيار المستخدم</label>
+                    <select id="loginUser">
+                        <option value="admin">مدير (وصول كامل)</option>
+                        <option value="cashier">كاشير (مبيعات فقط)</option>
+                    </select>
+                </div>
+                <button onclick="app.login()" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- التطبيق الرئيسي -->
+    <div id="appContainer" class="app-container" style="display:none;">
+        <!-- الشريط العلوي -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" onclick="app.toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="topbar-brand">
+                    <i class="fas fa-tshirt"></i>
+                    <span>نظام إدارة الملابس</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <!-- زر الوضع الليلي -->
+                <button id="darkModeToggle" class="btn btn-sm btn-outline" onclick="Theme.toggle()" title="الوضع الليلي">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <span class="user-badge" id="userBadge"><i class="fas fa-user-shield"></i> <span id="userName">مدير</span></span>
+                <button onclick="app.logout()" class="btn btn-sm btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+            </div>
+        </header>
+
+        <div class="main-wrapper">
+            <!-- القائمة الجانبية -->
+            <aside class="sidebar" id="sidebar">
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active" data-page="dashboard" onclick="app.navigate('dashboard')">
+                        <i class="fas fa-chart-pie"></i> <span>لوحة التحكم</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="products" onclick="app.navigate('products')">
+                        <i class="fas fa-box"></i> <span>المنتجات</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="sales" onclick="app.navigate('sales')">
+                        <i class="fas fa-shopping-cart"></i> <span>المبيعات</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="inventory" onclick="app.navigate('inventory')">
+                        <i class="fas fa-warehouse"></i> <span>المخزون</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="purchases" onclick="app.navigate('purchases')">
+                        <i class="fas fa-truck-loading"></i> <span>المشتريات</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="suppliers" onclick="app.navigate('suppliers')">
+                        <i class="fas fa-handshake"></i> <span>الموردين</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="logs" onclick="app.navigate('logs')">
+                        <i class="fas fa-history"></i> <span>سجل النشاطات</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="profit" onclick="app.navigate('profit')">
+                        <i class="fas fa-chart-line"></i> <span>تحليل الأرباح</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings" onclick="app.navigate('settings')">
+                        <i class="fas fa-cog"></i> <span>الإعدادات</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- المحتوى الرئيسي -->
+            <main class="main-content" id="mainContent">
+                <!-- يتم تحميل الصفحات هنا ديناميكياً -->
+            </main>
+        </div>
+    </div>
+
+    <!-- إشعار Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/modules/data.js"></script>
+    <script src="js/modules/auth.js"></script>
+    <script src="js/modules/theme.js"></script>
+    <script src="js/modules/products.js"></script>
+    <script src="js/modules/sales.js"></script>
+    <script src="js/modules/inventory.js"></script>
+    <script src="js/modules/purchases.js"></script>
+    <script src="js/modules/suppliers.js"></script>
+    <script src="js/modules/logs.js"></script>
+    <script src="js/modules/profit.js"></script>
+    <script src="js/modules/dashboard.js"></script>
+    <script src="js/modules/app.js"></script>
+</body>
+</html>
