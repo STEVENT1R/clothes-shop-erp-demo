@@ -1,9 +1,0 @@
-- [x] Analyze current codebase issues
-- [ ] Fix CSS - consolidate duplicate responsive sections, fix class name mismatch
-- [ ] Fix JS - update sidebar breakpoint and class names
-- [ ] Generate proper PNG icons for PWA
-- [ ] Update manifest.json with display_override and better config
-- [ ] Add iOS splash screen meta tags
-- [ ] Improve SW.js for better caching
-- [ ] Add PWA offline page support
-- [ ] Commit and push to GitHub
