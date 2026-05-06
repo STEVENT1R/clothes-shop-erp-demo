@@ -14,7 +14,7 @@ export default defineConfig({
         short_name: 'متجر الملابس',
         description: 'ERP نظام إدارة متجر الملابس',
         start_url: '/clothes-shop-erp-demo/',
-        display: 'fullscreen',
+        display: 'standalone',
         background_color: '#0f0f23',
         theme_color: '#6C5CE7',
         orientation: 'any',
