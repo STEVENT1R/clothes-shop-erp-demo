@@ -5,7 +5,7 @@
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
   "background_color": "#f8fafc",
   "theme_color": "#6366f1",
@@ -13,8 +13,6 @@
   "lang": "ar",
   "categories": ["business", "productivity"],
   "id": "/clothes-erp-demo/",
-  "iarc_rating_id": "",
-  "screenshots": [],
   "prefer_related_applications": false,
   "icons": [
     {
