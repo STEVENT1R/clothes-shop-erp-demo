@@ -1118,17 +1118,18 @@ export default function App() {
     </ThemeContext.Provider>
   );
 
-  const navItems = [
+  const allNavItems = [
     { id: 'dashboard', label: 'الرئيسية', icon: FiHome },
-    { id: 'products', label: 'المنتجات', icon: FiShoppingBag },
+    { id: 'products', label: 'المنتجات', icon: FiShoppingBag, adminOnly: true },
     { id: 'sales', label: 'البيع', icon: FiShoppingCart },
     { id: 'inventory', label: 'المخزون', icon: FiPackage },
-    { id: 'purchases', label: 'المشتريات', icon: FiTruck },
-    { id: 'debts', label: 'المديونيات', icon: FiCreditCard },
+    { id: 'purchases', label: 'المشتريات', icon: FiTruck, adminOnly: true },
+    { id: 'debts', label: 'المديونيات', icon: FiCreditCard, adminOnly: true },
     { id: 'logs', label: 'السجلات', icon: FiFileText },
-    { id: 'profit', label: 'الأرباح', icon: FiBarChart2 },
+    { id: 'profit', label: 'الأرباح', icon: FiBarChart2, adminOnly: true },
     { id: 'settings', label: 'الإعدادات', icon: FiSettings },
   ];
+  const navItems = user === 'admin' ? allNavItems : allNavItems.filter(item => !item.adminOnly);
 
   const pageTitles = {
     dashboard: 'لوحة التحكم', products: 'المنتجات', sales: 'نقطة البيع',
