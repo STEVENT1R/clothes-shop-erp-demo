@@ -1104,10 +1104,10 @@ function CashierLayout({ page, setPage, onLogout, children }) {
   const { theme, toggleTheme } = useContext(ThemeContext);
   
   const cashierPages = [
-    { id: 'sales', label: '🛒 البيع', icon: FiShoppingCart },
-    { id: 'inventory', label: '📦 المخزون', icon: FiPackage },
-    { id: 'logs', label: '📋 السجلات', icon: FiFileText },
-    { id: 'settings', label: '⚙️', icon: FiSettings },
+    { id: 'sales', label: 'البيع', icon: FiShoppingCart },
+    { id: 'inventory', label: 'المخزون', icon: FiPackage },
+    { id: 'logs', label: 'السجلات', icon: FiFileText },
+    { id: 'settings', label: 'الإعدادات', icon: FiSettings },
   ];
 
   return (
