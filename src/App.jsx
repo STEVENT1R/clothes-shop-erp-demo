@@ -1353,7 +1353,7 @@ export default function App() {
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <AppProvider>
-        <div style={{ display: 'flex', minHeight: '100vh' }}>
+        <div className="admin-layout">
           <div className={`sidebar-overlay ${sidebarOpen ? 'open' : ''}`} onClick={() => setSidebarOpen(false)} />
           <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
             <div className="sidebar-header">

@@ -65,6 +65,8 @@
 
 html {
   font-size: 18px;
+  /* Use dvh for accurate viewport height on mobile PWA */
+  min-height: -webkit-fill-available;
 }
 
 body {
@@ -74,6 +76,8 @@ body {
   line-height: 1.7;
   transition: background 0.3s, color 0.3s;
   overflow-x: hidden;
+  /* body padding handled by #root children for PWA safe areas */
+  margin: 0;
 }
 
 ::-webkit-scrollbar { width: 6px; }
@@ -124,11 +128,17 @@ body {
 /* ===== LOGIN PAGE ===== */
 .login-page {
   min-height: 100vh;
+  min-height: calc(100vh - constant(safe-area-inset-bottom, 0px));
+  min-height: calc(100vh - env(safe-area-inset-bottom, 0px));
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-card) 100%);
   padding: 1rem;
+  padding-top: calc(1rem + constant(safe-area-inset-top, 0px));
+  padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(1rem + constant(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
   position: relative;
   overflow: hidden;
 }
@@ -269,6 +279,15 @@ body {
 .app-layout {
   display: flex;
   min-height: 100vh;
+  min-height: calc(100vh - constant(safe-area-inset-bottom, 0px));
+  min-height: calc(100vh - env(safe-area-inset-bottom, 0px));
+}
+
+/* ===== ADMIN LAYOUT (PWA safe-area container) ===== */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 
 /* ===== SIDEBAR ===== */
@@ -277,14 +296,18 @@ body {
   background: var(--bg-sidebar);
   color: var(--text-white);
   position: fixed;
+  top: 0;
   height: 100vh;
+  height: calc(100vh - constant(safe-area-inset-bottom, 0px));
   height: calc(100vh - env(safe-area-inset-bottom, 0px));
   z-index: 100;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
   overflow: hidden;
+  padding-top: constant(safe-area-inset-top, 0px);
   padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: constant(safe-area-inset-bottom, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
@@ -432,6 +455,7 @@ body {
   top: 0;
   z-index: 50;
   backdrop-filter: blur(20px);
+  padding-top: calc(1rem + constant(safe-area-inset-top, 0px));
   padding-top: calc(1rem + env(safe-area-inset-top, 0px));
 }
 
@@ -1353,6 +1377,7 @@ tr:hover td {
   background: var(--bg-nav);
   border-top: 1px solid var(--border);
   padding: 6px 4px;
+  padding-bottom: calc(6px + constant(safe-area-inset-bottom, 0px));
   padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
   z-index: 200;
   backdrop-filter: blur(20px);
@@ -1455,7 +1480,9 @@ tr:hover td {
   background: var(--bg-card);
   border-bottom: 1px solid var(--border);
   padding: 0 1.5rem;
+  padding-top: constant(safe-area-inset-top, 0px);
   padding-top: env(safe-area-inset-top, 0px);
+  height: calc(64px + constant(safe-area-inset-top, 0px));
   height: calc(64px + env(safe-area-inset-top, 0px));
   display: flex;
   align-items: center;
