@@ -1438,6 +1438,128 @@ tr:hover td {
   .pos-products-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* ===== CASHIER LAYOUT (POS-First) ===== */
+.cashier-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-body);
+}
+
+.cashier-header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.cashier-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  font-weight: 900;
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+.cashier-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
+}
+
+.cashier-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.cashier-nav-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--primary);
+}
+
+.cashier-nav-btn.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 12px rgba(108,92,231,0.3);
+}
+
+.cashier-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cashier-header-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.cashier-header-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.cashier-content {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .cashier-header {
+    padding: 0 0.75rem;
+    height: 56px;
+  }
+  .cashier-nav {
+    gap: 2px;
+  }
+  .cashier-nav-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+  .cashier-nav-btn span {
+    display: none;
+  }
+  .cashier-content {
+    padding: 1rem;
+  }
+}
+
 @media (max-width: 480px) {
   html { font-size: 16px; }
   .stats-grid { grid-template-columns: 1fr; }

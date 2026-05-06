@@ -1100,6 +1100,49 @@ function SettingsPageWrapper({ onLogout }) {
 }
 
 // ===== MAIN APP =====
+function CashierLayout({ page, setPage, onLogout, children }) {
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  
+  const cashierPages = [
+    { id: 'sales', label: '🛒 البيع', icon: FiShoppingCart },
+    { id: 'inventory', label: '📦 المخزون', icon: FiPackage },
+    { id: 'logs', label: '📋 السجلات', icon: FiFileText },
+    { id: 'settings', label: '⚙️', icon: FiSettings },
+  ];
+
+  return (
+    <div className="cashier-layout">
+      <header className="cashier-header">
+        <div className="cashier-brand">
+          <FiShoppingBag size={22} />
+          <span>متجر الملابس</span>
+        </div>
+        <nav className="cashier-nav">
+          {cashierPages.map(p => {
+            const Icon = p.icon;
+            return (
+              <button key={p.id} className={`cashier-nav-btn ${page === p.id ? 'active' : ''}`}
+                onClick={() => setPage(p.id)}>
+                <Icon size={18} />
+                <span>{p.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+        <div className="cashier-header-actions">
+          <button className="cashier-header-btn" onClick={toggleTheme} title="تغيير السمة">
+            {theme === 'light' ? <FiMoon size={16} /> : <FiSun size={16} />}
+          </button>
+          <button className="cashier-header-btn" onClick={onLogout} title="تسجيل الخروج">
+            <FiLogOut size={16} />
+          </button>
+        </div>
+      </header>
+      <main className="cashier-content">{children}</main>
+    </div>
+  );
+}
+
 export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('erp_theme') || 'light');
   const [user, setUser] = useState(null);
@@ -1114,7 +1157,7 @@ export default function App() {
 
   if (!user) return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <LoginPage onLogin={(role) => { setUser(role); setPage('dashboard'); }} />
+      <LoginPage onLogin={(role) => { setUser(role); setPage(role === 'cashier' ? 'sales' : 'dashboard'); }} />
     </ThemeContext.Provider>
   );
 
@@ -1153,6 +1196,19 @@ export default function App() {
       default: return <DashboardPage />;
     }
   };
+
+  // Cashier gets a simplified POS-first layout
+  if (user === 'cashier') {
+    return (
+      <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <AppProvider>
+          <CashierLayout page={page} setPage={setPage} onLogout={() => setUser(null)}>
+            {renderPage()}
+          </CashierLayout>
+        </AppProvider>
+      </ThemeContext.Provider>
+    );
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
