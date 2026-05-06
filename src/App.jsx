@@ -1102,7 +1102,7 @@ function SettingsPageWrapper({ onLogout }) {
 // ===== MAIN APP =====
 export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('erp_theme') || 'light');
-  const [user, setUser] = useState(() => localStorage.getItem('erp_user') || null);
+  const [user, setUser] = useState(null);
   const [page, setPage] = useState(() => localStorage.getItem('erp_page') || 'dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
