@@ -497,13 +497,14 @@ function AddProductModal({ onClose, onAdd }) {
 
 // ===== SALES (POS) =====
 function SalesPage() {
-  const { products, makeSale } = useApp();
+  const { products, makeSale, sales } = useApp();
   const [cart, setCart] = useState([]);
   const [selProd, setSelProd] = useState(null);
   const [selColor, setSelColor] = useState(null);
   const [selSize, setSelSize] = useState(null);
   const [qty, setQty] = useState(1);
   const [toast, setToast] = useState(null);
+  const [receipt, setReceipt] = useState(null);
   const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
 
   const addToCart = () => {
@@ -526,9 +527,91 @@ function SalesPage() {
 
   const completeSale = () => {
     if (!cart.length) return setToast({ msg: 'السلة فارغة', type: 'error' });
-    makeSale(cart);
-    setToast({ msg: `✅ تمت عملية البيع بنجاح! الإجمالي: ${cartTotal.toLocaleString()} ج.م`, type: 'success' });
+    const saleResult = makeSale(cart);
+    // Get the latest sale id for the receipt
+    const lastSaleId = sales.length + 1;
+    setReceipt({
+      id: lastSaleId,
+      date: getToday(),
+      time: getTime(),
+      items: [...cart],
+      total: cartTotal,
+    });
     setCart([]); setSelProd(null); setSelColor(null); setSelSize(null);
+  };
+
+  const printReceipt = (receiptData) => {
+    const printWindow = window.open('', '_blank', 'width=300,height=600');
+    if (!printWindow) return;
+    
+    const itemsHtml = receiptData.items.map(item => `
+      <tr>
+        <td style="padding:6px 4px;border-bottom:1px dashed #ddd;font-size:12px">${item.name}</td>
+        <td style="padding:6px 4px;border-bottom:1px dashed #ddd;font-size:11px;color:#666">${item.color}/${item.size}</td>
+        <td style="padding:6px 4px;border-bottom:1px dashed #ddd;font-size:12px;text-align:center">${item.qty}</td>
+        <td style="padding:6px 4px;border-bottom:1px dashed #ddd;font-size:12px;text-align:left">${(item.price * item.qty).toLocaleString()}</td>
+      </tr>
+    `).join('');
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html dir="rtl">
+      <head>
+        <meta charset="UTF-8">
+        <title>فاتورة #${receiptData.id}</title>
+        <style>
+          @page { margin: 0; size: 80mm auto; }
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Tajawal', 'Segoe UI', sans-serif; padding: 12px; font-size: 13px; color: #222; }
+          .header { text-align: center; border-bottom: 2px solid #6C5CE7; padding-bottom: 10px; margin-bottom: 10px; }
+          .header h2 { font-size: 16px; color: #6C5CE7; margin-bottom: 4px; }
+          .header p { font-size: 11px; color: #666; }
+          .receipt-info { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #ccc; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+          th { font-size: 11px; padding: 6px 4px; border-bottom: 2px solid #6C5CE7; text-align: center; color: #6C5CE7; }
+          th:first-child { text-align: right; }
+          th:last-child { text-align: left; }
+          td:first-child { text-align: right; }
+          .total { display: flex; justify-content: space-between; padding: 10px 0; border-top: 2px solid #6C5CE7; font-size: 15px; font-weight: 900; margin-bottom: 10px; }
+          .footer { text-align: center; font-size: 10px; color: #999; border-top: 1px dashed #ccc; padding-top: 8px; }
+          .items-count { font-size: 11px; color: #666; text-align: center; margin-bottom: 6px; }
+          @media print { body { padding: 8px; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h2>🛍️ متجر الملابس</h2>
+          <p>Clothes Shop</p>
+        </div>
+        <div class="receipt-info">
+          <span>فاتورة #${receiptData.id}</span>
+          <span>${receiptData.date} ${receiptData.time}</span>
+        </div>
+        <div class="items-count">عدد القطع: ${receiptData.items.reduce((s,i) => s + i.qty, 0)}</div>
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:right">المنتج</th>
+              <th style="text-align:center">النوع</th>
+              <th style="text-align:center">العدد</th>
+              <th style="text-align:left">السعر</th>
+            </tr>
+          </thead>
+          <tbody>${itemsHtml}</tbody>
+        </table>
+        <div class="total">
+          <span>الإجمالي</span>
+          <span>${receiptData.total.toLocaleString()} ج.م</span>
+        </div>
+        <div class="footer">
+          <p>شكراً لتسوقكم معنا 🙏</p>
+          <p>نظام إدارة متجر الملابس</p>
+        </div>
+        <script>window.print();<\/script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   return (
@@ -625,6 +708,63 @@ function SalesPage() {
           </div>
         </div>
       </div>
+
+      {/* Receipt Modal */}
+      {receipt && (
+        <div className="modal-overlay" onClick={() => setReceipt(null)}>
+          <div className="modal" style={{ maxWidth: '380px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header" style={{ borderBottom: '2px solid var(--success)' }}>
+              <h3 className="modal-title" style={{ color: 'var(--success)' }}><FiCheck /> تم البيع بنجاح!</h3>
+              <button className="modal-close" onClick={() => setReceipt(null)}><FiX /></button>
+            </div>
+            <div style={{ padding: '0.5rem 0' }}>
+              <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--primary)' }}>🛍️ متجر الملابس</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>فاتورة #{(receipt.id)}</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{receipt.date} {receipt.time}</div>
+              </div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '8px', borderBottom: '1px dashed var(--border)', paddingBottom: '8px' }}>
+                عدد القطع: {receipt.items.reduce((s,i) => s + i.qty, 0)}
+              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', fontSize: '0.78rem' }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'right', padding: '4px', borderBottom: '1px solid var(--border)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>المنتج</th>
+                    <th style={{ textAlign: 'center', padding: '4px', borderBottom: '1px solid var(--border)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>النوع</th>
+                    <th style={{ textAlign: 'center', padding: '4px', borderBottom: '1px solid var(--border)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>العدد</th>
+                    <th style={{ textAlign: 'left', padding: '4px', borderBottom: '1px solid var(--border)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>السعر</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {receipt.items.map((item, i) => (
+                    <tr key={i}>
+                      <td style={{ padding: '6px 4px', borderBottom: '1px dashed var(--border)', fontWeight: 600 }}>{item.name}</td>
+                      <td style={{ padding: '6px 4px', borderBottom: '1px dashed var(--border)', color: 'var(--text-secondary)', textAlign: 'center' }}>{item.color}/{item.size}</td>
+                      <td style={{ padding: '6px 4px', borderBottom: '1px dashed var(--border)', textAlign: 'center' }}>{item.qty}</td>
+                      <td style={{ padding: '6px 4px', borderBottom: '1px dashed var(--border)', textAlign: 'left', fontWeight: 700 }}>{(item.price * item.qty).toLocaleString()} ج.م</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '2px solid var(--primary)', fontSize: '1.1rem', fontWeight: 900, marginBottom: '12px' }}>
+                <span>الإجمالي</span>
+                <span style={{ color: 'var(--success)' }}>{receipt.total.toLocaleString()} ج.م</span>
+              </div>
+              <div style={{ textAlign: 'center', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                شكراً لتسوقكم معنا 🙏
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => { printReceipt(receipt); }}>
+                🖨️ طباعة الفاتورة
+              </button>
+              <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setReceipt(null)}>
+                <FiCheck /> موافق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
