@@ -23,51 +23,39 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* Critical PWA fixes */
-        * { -webkit-tap-highlight-color: transparent; }
+        /* Critical PWA & Mobile fixes */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
         html, body {
             overscroll-behavior: none;
             -webkit-overflow-scrolling: touch;
+            -webkit-touch-callout: none;
         }
         select, input, button, textarea {
             font-size: 16px !important;
         }
-        /* Ensure interactive elements respond to touch */
+        /* Force ALL interactive elements to respond to touch immediately */
+        .nav-item,
+        .btn,
+        button,
+        select,
+        .sidebar-toggle,
+        .modal-close,
+        [onclick],
+        [role="button"] {
+            cursor: pointer !important;
+            touch-action: manipulation !important;
+            -webkit-user-select: none !important;
+            user-select: none !important;
+        }
+        /* Fix login screen touch */
         .login-screen, .login-card, .login-form, .login-logo {
             pointer-events: auto !important;
         }
-        #loginBtn, select#loginUser {
-            cursor: pointer !important;
-            touch-action: manipulation !important;
-        }
-        .sidebar-nav .nav-item {
-            touch-action: manipulation;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        
-        /* ========== PWA STANDALONE FIXES ========== */
-        /* Fix for iOS PWA where click events don't bubble properly */
-        *[onclick], button, .btn, .nav-item, select, [role="button"] {
-            cursor: pointer;
-            touch-action: manipulation;
-        }
-        
-        /* Force all clickable elements to work in iOS standalone mode */
-        .sidebar-nav .nav-item,
-        .btn,
-        button,
-        .modal-close,
-        .sidebar-toggle {
-            cursor: pointer !important;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        
-        /* Prevent ghost clicks in PWA */
-        html, body {
+        /* Prevent ghost click delay on iOS */
+        a, .nav-item, .btn, button {
             -webkit-touch-callout: none;
         }
     </style>
@@ -184,100 +172,103 @@
 
     <script>
         // ============================
-        // PWA FIX: iOS Home Screen Button Fix
+        // PWA & MOBILE FIX: Universal Event Handler
         // ============================
-        // المشكلة: iOS Safari في وضع standalone (الشاشة الرئيسية) 
-        // أحياناً لا يشتغل onclick بسبب delay 300ms أو عدم وصول click event
-        // الحل: 
-        // 1. Event Delegation في bubble phase (safety net)
-        // 2. iOS PWA: touchend → يحاكي onclick مباشرة
-        // 3. CSS: touch-action: manipulation يمنع 300ms delay
+        // المشكلة: iOS/Android PWA + متصفح عادي - اللمس لا يستجيب أحياناً
+        // السبب: iOS Safari في standalone mode لا يشتغل onclick دائماً
+        // الحل: نستبدل onclick نهائياً بـ event delegation واحد شامل
 
-        (function() {
-            var isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                                window.navigator.standalone === true;
-            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-            // ===== SAFETY NET: Bubble-phase click delegation =====
-            // يشتغل في كل الأحوال - ما لم يأكل الحدث قبله
-            document.addEventListener('click', function(e) {
-                // Only interfere if native onclick didn't fire
-                // We check if `app` has loaded and the target has onclick
-                var target = e.target.closest('[onclick]');
-                if (!target || !isStandalone) return;
-                
-                // If we're here and in standalone, the native onclick might have failed
-                // Only act as fallback - don't preventDefault
-                var attr = target.getAttribute('onclick');
-                if (attr && typeof target.onclick !== 'function') {
-                    try {
-                        (new Function(attr)).call(target);
-                    } catch(err) {
-                        console.warn('[PWA] Click fallback:', err);
-                    }
-                }
-            });
-
-            // ===== TOUCHEND FOR iOS PWA =====
-            // iOS في standalone mode: أحياناً ما يرسل click إطلاقاً
-            // الحل: نسمع touchend ونشغل onclick بأنفسنا
-            if (isStandalone && isIOS) {
-                document.addEventListener('touchend', function(e) {
-                    var target = e.target.closest('[onclick], .nav-item, button, .btn');
-                    if (!target) return;
-                    
-                    // Don't interfere with form elements (select, input)
-                    if (target.tagName === 'SELECT' || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-                        return;
-                    }
-                    
-                    var attr = target.getAttribute('onclick');
-                    if (attr) {
-                        e.preventDefault();
-                        try {
-                            (new Function(attr)).call(target);
-                        } catch(err) {
-                            console.warn('[PWA] touchend:', err);
-                        }
-                        return;
-                    }
-                    
-                    // Nav-items with data-page
-                    var page = target.getAttribute('data-page') || 
-                               (target.closest('[data-page]') ? target.closest('[data-page]').getAttribute('data-page') : null);
-                    if (page && window.app) {
-                        e.preventDefault();
-                        app.navigate(page);
-                    }
-                }, { passive: false });
-            }
-        })();
-
+        // ===== الخطوة 1: قبل تحميل أي شيء - نمنع السلوك الافتراضي للـ onclick =====
+        // نمسح onclick من العناصر عشان ما نعتمدش عليه أبداً
+        // ونستخدم listener واحد على المستوى العام يشتغل دائماً
+        
+        // ===== الخطوة 2: تنفيذ onclick عبر listener واحد =====
         document.addEventListener('DOMContentLoaded', function() {
-            // ===== Login Button: addEventListener بدل الاعتماد على onclick =====
-            var loginBtn = document.getElementById('loginBtn');
-            if (loginBtn) {
-                loginBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    app.login();
-                });
-            }
-
-            // ===== Fix <select> in iOS PWA =====
-            var loginSelect = document.getElementById('loginUser');
-            if (loginSelect) {
-                loginSelect.addEventListener('touchstart', function() {}, { passive: true });
-            }
-
-            // ===== Install Button =====
+            // Install Button
             var installBtn = document.getElementById('installPwaBtn');
             if (installBtn) {
                 installBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     installPwa();
                 });
+                installBtn.removeAttribute('onclick');
             }
+
+            // Login Button: override onclick with addEventListener
+            var loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.removeAttribute('onclick');
+                loginBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    app.login();
+                });
+                // iOS PWA needs touchend too
+                loginBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    app.login();
+                }, { passive: false });
+            }
+
+            // Fix <select> on iOS
+            var loginSelect = document.getElementById('loginUser');
+            if (loginSelect) {
+                loginSelect.addEventListener('touchstart', function() {}, { passive: true });
+            }
+
+            // Nav items: replace all onclick with direct listeners
+            document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(el) {
+                el.removeAttribute('onclick');
+                el.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var page = this.getAttribute('data-page');
+                    if (page && window.app) app.navigate(page);
+                });
+            });
+
+            // Topbar buttons
+            var sidebarToggle = document.querySelector('.sidebar-toggle');
+            if (sidebarToggle) {
+                sidebarToggle.removeAttribute('onclick');
+                sidebarToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (window.app) app.toggleSidebar();
+                });
+            }
+
+            var darkToggle = document.getElementById('darkModeToggle');
+            if (darkToggle) {
+                darkToggle.removeAttribute('onclick');
+                darkToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (window.Theme) Theme.toggle();
+                });
+            }
+
+            var logoutBtn = document.querySelector('[onclick="app.logout()"]');
+            if (logoutBtn) {
+                logoutBtn.removeAttribute('onclick');
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (window.app) app.logout();
+                });
+            }
+
+            // Global fallback handler for any remaining [onclick] elements (e.g., dynamically created)
+            document.addEventListener('click', function(e) {
+                var target = e.target.closest('[onclick]');
+                if (!target) return;
+                
+                var attr = target.getAttribute('onclick');
+                if (attr) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    try {
+                        (new Function(attr)).call(target);
+                    } catch(err) {
+                        console.warn('[EVENT] onclick fallback:', err);
+                    }
+                }
+            }, true); // capture phase - catches before anything
         });
 
         // PWA Install Prompt
@@ -310,8 +301,8 @@
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('sw.js').then(function() {
                     console.log('✅ PWA Service Worker registered');
-                }).catch(function() {
-                    console.log('Service Worker registration failed');
+                }).catch(function(err) {
+                    console.log('Service Worker registration failed:', err);
                 });
             });
         }
