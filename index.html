@@ -9,12 +9,11 @@
     <meta name="apple-mobile-web-app-title" content="Clothes ERP">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Clothes ERP">
-    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-192.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
     <title>نظام إدارة الملابس - Clothes ERP</title>
@@ -24,19 +23,52 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* Fix iOS PWA touch delay + click issues */
-        *, button, select, input, textarea, a, .nav-item, .btn, .variant-chip, .modal-close {
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-        button, .btn, select, .nav-item, .variant-chip, .modal-close, [onclick] {
-            cursor: pointer;
+        /* Critical PWA fixes */
+        * { -webkit-tap-highlight-color: transparent; }
+        html, body {
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
         }
         select, input, button, textarea {
-            font-size: 16px !important; /* Prevent iOS zoom on focus */
+            font-size: 16px !important;
         }
-        body {
-            -webkit-overflow-scrolling: touch;
+        /* Ensure interactive elements respond to touch */
+        .login-screen, .login-card, .login-form, .login-logo {
+            pointer-events: auto !important;
+        }
+        #loginBtn, select#loginUser {
+            cursor: pointer !important;
+            touch-action: manipulation !important;
+        }
+        .sidebar-nav .nav-item {
+            touch-action: manipulation;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        /* ========== PWA STANDALONE FIXES ========== */
+        /* Fix for iOS PWA where click events don't bubble properly */
+        *[onclick], button, .btn, .nav-item, select, [role="button"] {
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        
+        /* Force all clickable elements to work in iOS standalone mode */
+        .sidebar-nav .nav-item,
+        .btn,
+        button,
+        .modal-close,
+        .sidebar-toggle {
+            cursor: pointer !important;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        /* Prevent ghost clicks in PWA */
+        html, body {
+            -webkit-touch-callout: none;
         }
     </style>
 </head>
@@ -92,33 +124,33 @@
             <!-- القائمة الجانبية -->
             <aside class="sidebar" id="sidebar">
                 <nav class="sidebar-nav">
-                    <a href="#" class="nav-item active" data-page="dashboard" onclick="app.navigate('dashboard')">
+                    <div class="nav-item active" data-page="dashboard" onclick="app.navigate('dashboard')">
                         <i class="fas fa-chart-pie"></i> <span>لوحة التحكم</span>
-                    </a>
-                    <a href="#" class="nav-item" data-page="products" onclick="app.navigate('products')">
+                    </div>
+                    <div class="nav-item" data-page="products" onclick="app.navigate('products')">
                         <i class="fas fa-box"></i> <span>المنتجات</span>
-                    </a>
-                    <a href="#" class="nav-item" data-page="sales" onclick="app.navigate('sales')">
+                    </div>
+                    <div class="nav-item" data-page="sales" onclick="app.navigate('sales')">
                         <i class="fas fa-shopping-cart"></i> <span>المبيعات</span>
-                    </a>
-                    <a href="#" class="nav-item" data-page="inventory" onclick="app.navigate('inventory')">
+                    </div>
+                    <div class="nav-item" data-page="inventory" onclick="app.navigate('inventory')">
                         <i class="fas fa-warehouse"></i> <span>المخزون</span>
-                    </a>
-                    <a href="#" class="nav-item" data-page="purchases" onclick="app.navigate('purchases')">
+                    </div>
+                    <div class="nav-item" data-page="purchases" onclick="app.navigate('purchases')">
                         <i class="fas fa-truck-loading"></i> <span>المشتريات</span>
-                    </a>
-                    <a href="#" class="nav-item" data-page="suppliers" onclick="app.navigate('suppliers')">
+                    </div>
+                    <div class="nav-item" data-page="suppliers" onclick="app.navigate('suppliers')">
                         <i class="fas fa-handshake"></i> <span>الموردين</span>
-                    </a>
-                    <a href="#" class="nav-item" data-page="logs" onclick="app.navigate('logs')">
+                    </div>
+                    <div class="nav-item" data-page="logs" onclick="app.navigate('logs')">
                         <i class="fas fa-history"></i> <span>سجل النشاطات</span>
-                    </a>
-                    <a href="#" class="nav-item" data-page="profit" onclick="app.navigate('profit')">
+                    </div>
+                    <div class="nav-item" data-page="profit" onclick="app.navigate('profit')">
                         <i class="fas fa-chart-line"></i> <span>تحليل الأرباح</span>
-                    </a>
-                    <a href="#" class="nav-item" data-page="settings" onclick="app.navigate('settings')">
+                    </div>
+                    <div class="nav-item" data-page="settings" onclick="app.navigate('settings')">
                         <i class="fas fa-cog"></i> <span>الإعدادات</span>
-                    </a>
+                    </div>
                 </nav>
             </aside>
 
@@ -145,39 +177,108 @@
             </div>
         </div>
         <div style="display:flex;gap:8px">
-            <button onclick="dismissPwaBanner()" style="background:transparent;border:none;color:var(--gray-400);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px">تخطي</button>
-            <button id="installPwaBtn" onclick="installPwa()" style="background:var(--primary);border:none;color:white;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px">تثبيت</button>
+            <span onclick="dismissPwaBanner()" style="background:transparent;border:none;color:var(--gray-400);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px">تخطي</span>
+            <span id="installPwaBtn" onclick="installPwa()" style="background:var(--primary);border:none;color:white;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px">تثبيت</span>
         </div>
     </div>
 
     <script>
         // ============================
-        // التهيئة المبكرة - قبل تحميل Font Awesome
+        // PWA FIX: iOS Home Screen Button Fix
         // ============================
-        
-        // دالة تسجيل الدخول المباشرة (تعمل حتى لو Font Awesome ما زال يحمل)
-        window.earlyLogin = function() {
-            var select = document.getElementById('loginUser');
-            if (!select) return;
-            
-            // نخفي شاشة الدخول فوراً
-            var loginScreen = document.getElementById('loginScreen');
-            if (loginScreen) loginScreen.style.display = 'none';
-            
-            var appContainer = document.getElementById('appContainer');
-            if (appContainer) appContainer.style.display = 'flex';
-        };
+        // المشكلة: iOS Safari في وضع standalone (الشاشة الرئيسية) 
+        // أحياناً لا يشتغل onclick بسبب delay 300ms أو عدم وصول click event
+        // الحل: 
+        // 1. Event Delegation في bubble phase (safety net)
+        // 2. iOS PWA: touchend → يحاكي onclick مباشرة
+        // 3. CSS: touch-action: manipulation يمنع 300ms delay
 
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js').then(function() {
-                    console.log('✅ PWA Service Worker registered');
-                }).catch(function() {
-                    console.log('Service Worker registration failed');
-                });
+        (function() {
+            var isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                                window.navigator.standalone === true;
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+            // ===== SAFETY NET: Bubble-phase click delegation =====
+            // يشتغل في كل الأحوال - ما لم يأكل الحدث قبله
+            document.addEventListener('click', function(e) {
+                // Only interfere if native onclick didn't fire
+                // We check if `app` has loaded and the target has onclick
+                var target = e.target.closest('[onclick]');
+                if (!target || !isStandalone) return;
+                
+                // If we're here and in standalone, the native onclick might have failed
+                // Only act as fallback - don't preventDefault
+                var attr = target.getAttribute('onclick');
+                if (attr && typeof target.onclick !== 'function') {
+                    try {
+                        (new Function(attr)).call(target);
+                    } catch(err) {
+                        console.warn('[PWA] Click fallback:', err);
+                    }
+                }
             });
-        }
+
+            // ===== TOUCHEND FOR iOS PWA =====
+            // iOS في standalone mode: أحياناً ما يرسل click إطلاقاً
+            // الحل: نسمع touchend ونشغل onclick بأنفسنا
+            if (isStandalone && isIOS) {
+                document.addEventListener('touchend', function(e) {
+                    var target = e.target.closest('[onclick], .nav-item, button, .btn');
+                    if (!target) return;
+                    
+                    // Don't interfere with form elements (select, input)
+                    if (target.tagName === 'SELECT' || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                        return;
+                    }
+                    
+                    var attr = target.getAttribute('onclick');
+                    if (attr) {
+                        e.preventDefault();
+                        try {
+                            (new Function(attr)).call(target);
+                        } catch(err) {
+                            console.warn('[PWA] touchend:', err);
+                        }
+                        return;
+                    }
+                    
+                    // Nav-items with data-page
+                    var page = target.getAttribute('data-page') || 
+                               (target.closest('[data-page]') ? target.closest('[data-page]').getAttribute('data-page') : null);
+                    if (page && window.app) {
+                        e.preventDefault();
+                        app.navigate(page);
+                    }
+                }, { passive: false });
+            }
+        })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // ===== Login Button: addEventListener بدل الاعتماد على onclick =====
+            var loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    app.login();
+                });
+            }
+
+            // ===== Fix <select> in iOS PWA =====
+            var loginSelect = document.getElementById('loginUser');
+            if (loginSelect) {
+                loginSelect.addEventListener('touchstart', function() {}, { passive: true });
+            }
+
+            // ===== Install Button =====
+            var installBtn = document.getElementById('installPwaBtn');
+            if (installBtn) {
+                installBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    installPwa();
+                });
+            }
+        });
 
         // PWA Install Prompt
         var deferredPrompt;
@@ -185,9 +286,7 @@
             e.preventDefault();
             deferredPrompt = e;
             var banner = document.getElementById('pwaBanner');
-            if (banner) {
-                banner.style.display = 'flex';
-            }
+            if (banner) banner.style.display = 'flex';
         });
 
         function installPwa() {
@@ -204,6 +303,17 @@
         function dismissPwaBanner() {
             var banner = document.getElementById('pwaBanner');
             if (banner) banner.style.display = 'none';
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js').then(function() {
+                    console.log('✅ PWA Service Worker registered');
+                }).catch(function() {
+                    console.log('Service Worker registration failed');
+                });
+            });
         }
     </script>
 
